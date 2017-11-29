@@ -64,6 +64,8 @@
 </template>
 
 <script>
+import Combinatorics from 'js-combinatorics';
+
 import outcome from './Outcome';
 
 import diceData from '../config/dice.js';
@@ -111,19 +113,32 @@ export default {
       }
     },
     populateOutcomes() {
-      console.log(`[${util.getTime()}] populating combos`);
-      var totalCombos = util.cartesian.apply(null, this.dice);
-      console.log(`[${util.getTime()}] populating outcomes`);
-      var outcomes = totalCombos.map((combo) => {
-        var combinedRoll = util.combineRolls.apply(null, combo);
-        return util.serializeRoll(combinedRoll);
-      });
+      util.debug('populating combos');
+      var totalCombos = Combinatorics.cartesianProduct.apply(null, this.dice).toArray();
+      util.debug('populating outcomes');
+      var outcomes = [];
+      var combinedRoll;
 
-      console.log(`[${util.getTime()}] setting totalOutcomes`);
-      this.totalOutcomes = outcomes.sort(util.sortRolls);
-      console.log(`[${util.getTime()}] setting uniqueOutcomes`);
-      this.uniqueOutcomes = this.totalOutcomes.unique();
-      console.log(`[${util.getTime()}] finished`);
+      for (var i = 0, j = totalCombos.length; i < j; i++) {
+        combinedRoll = util.combineRolls.apply(null, totalCombos[i]);
+        // console.log(totalCombos[i], combinedRoll);
+        outcomes.push(util.serializeRoll(combinedRoll));
+      }
+
+      // var outcomes = totalCombos.map((combo) => {
+      //   var combinedRoll = util.combineRolls.apply(null, combo);
+      //   return util.serializeRoll(combinedRoll);
+      // }); // this is slow
+
+      console.log(outcomes);
+
+      util.debug('setting totalOutcomes');
+      // commented out sorting because it's slow, and only necessary if we're rendering a results table
+      // this.totalOutcomes = outcomes.sort(util.sortRolls); // this is very slow
+      this.totalOutcomes = outcomes;
+      util.debug('setting uniqueOutcomes');
+      this.uniqueOutcomes = this.totalOutcomes.unique(); // this is a little slow
+      util.debug('finished populateOutcomes()');
     },
     populateOverview() {
       var successes = 0;

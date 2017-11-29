@@ -4,37 +4,6 @@ import dice from './config/dice.js';
 var util = {
 
   /**
-   * Generate all possible combination of any number
-   * of variable length arrays.
-   *
-   * @return {array} The complete set of possible combinations
-   */
-  cartesian() {
-    const arg = arguments;
-    const max = arg.length - 1;
-
-    var results = [];
-
-    function helper(arr, i) {
-      for (var j = 0, l = arg[i].length; j < l; j++) {
-        var a = arr.slice(0); // clone arr
-
-        a.push(arg[i][j]);
-
-        if (i == max) {
-          results.push(a);
-        } else {
-          helper(a, i + 1);
-        }
-      }
-    }
-
-    helper([], 0);
-
-    return results;
-  },
-
-  /**
    * Combine an array of roll results into a single
    * set of results.
    *
@@ -193,10 +162,29 @@ var util = {
     return Math.round(num * 10000) / 100;
   },
 
+  /**
+   * Get a string with the current (readable) timestamp
+   *
+   * @return {[type]} [description]
+   */
   getTime() {
-    var today = new Date();
+    const today = new Date();
+    const hours = `0${today.getHours()}`.slice(-2);
+    const minutes = `0${today.getMinutes()}`.slice(-2);
+    const seconds = `0${today.getSeconds()}`.slice(-2);
+    const milliseconds = `00${today.getMilliseconds()}`.slice(-3);
 
-    return `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+    return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+  },
+
+  /**
+   * Log a debug message that includes the current timestamp
+   *
+   * @param  {string} msg MEssage to include in the console log
+   * @return {null}
+   */
+  debug(msg) {
+    console.log(`[${util.getTime()}]: ${msg}`);
   }
 
 };
