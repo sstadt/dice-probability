@@ -33,8 +33,8 @@
 
 <script>
 import diceData from '../config/dice.js';
+import util from '../util.js';
 
-const resultTypes = diceData.resultTypes;
 const dieTypes = diceData.dieTypes;
 const dieResults = diceData.dieResults;
 
@@ -49,7 +49,8 @@ export default {
       challenge: 0,
       setback: 0,
       dice: [],
-      outcomes: []
+      totalOutcomes: [],
+      uniqueOutcomes: []
     };
   },
   methods: {
@@ -68,17 +69,14 @@ export default {
       }
     },
     populateOutcomes() {
-      let primaryDie = this.dice[0];
-      let secondaryDice = this.dice.slice(1);
+      var totalCombos = util.cartesian.apply(null, this.dice);
+      var outcomes = totalCombos.map((combo) => {
+        var combinedRoll = util.combineRolls.apply(null, combo);
+        return util.serializeRoll(combinedRoll);
+      });
 
-      for (var pfi = 0, pfl = primaryDie.length; pfi < pfl; pfi++) {
-        for (var si = 0, sl = secondaryDice.length; si < sl; si++) {
-          for (var sfi = 0, sfl = secondaryDice[si].length; sfi < sfl; sfi++) {
-            let result = primaryDie[pfi];
-
-          }
-        }
-      }
+      this.totalOutcomes = outcomes.sort(util.sortRolls);
+      this.uniqueOutcomes = this.totalOutcomes.unique();
     }
   }
 }

@@ -1,12 +1,4 @@
 export default {
-  resultTypes: [
-    'success',
-    'advantage',
-    'triumph',
-    'failure',
-    'threat',
-    'despair'
-  ],
   dieTypes: [
     'boost',
     'ability',
@@ -15,6 +7,14 @@ export default {
     'difficulty',
     'challenge'
   ],
+  resultScore: {
+    success: 1,
+    advantage: 0.1,
+    triumph: 1.1,
+    failure: -1,
+    threat: -0.1,
+    despair: -1.1
+  },
   dieResults: {
     boost: [ // d6
       {},                           // 1
