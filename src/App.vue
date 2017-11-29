@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <Calculator/>
+    <calculator/>
   </div>
 </template>
 
 <script>
-import Calculator from './components/Calculator'
+import calculator from './components/Calculator';
 
 export default {
   name: 'app',
   components: {
-    Calculator
+    calculator
   }
 }
 </script>

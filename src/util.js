@@ -74,6 +74,25 @@ var util = {
     return arr.sort(util.sortResults).join('|');
   },
 
+  deserializeRoll(roll) {
+    return roll.split('|').map((item) => {
+      var arr = item.split(':');
+      if (arr[1]) arr[1] = parseInt(arr[1]);
+      return arr;
+    });
+  },
+
+  convertRollToObject(roll) {
+    var rollArr = util.deserializeRoll(roll);
+    var result = {};
+
+    for (var i = 0, j = rollArr.length; i < j; i++) {
+      if (rollArr[i][1]) result[rollArr[i][0]] = rollArr[i][1];
+    }
+
+    return result;
+  },
+
   /**
    * Sorting function for arrays of result strings
    *
@@ -144,6 +163,40 @@ var util = {
     }
 
     return score;
+  },
+
+  /**
+   * Calculate occurances of a value in an array
+   *
+   * @param  {mixed}   needle   The item to look in the array for
+   * @param  {array}   haystack The array to scan
+   * @return {integer}          The count of items in the array that match needle
+   */
+  occurancesInArray(needle, haystack) {
+    var occurances = 0;
+
+    for (var i = 0, j = haystack.length; i < j; i++) {
+      if (needle === haystack[i]) occurances++;
+    }
+
+    return occurances;
+  },
+
+  /**
+   * Get a percentage string formatted to two decimal places
+   * from a decimal number.
+   *
+   * @param  {float}  num The decimal number to generate a percentage string from
+   * @return {string}     The resulting percentage
+   */
+  parsePercent(num) {
+    return Math.round(num * 10000) / 100;
+  },
+
+  getTime() {
+    var today = new Date();
+
+    return `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
   }
 
 };
