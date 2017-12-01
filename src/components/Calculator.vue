@@ -30,6 +30,10 @@
         </div>
       </form>
 
+      <div class="progress" v-if="progress > 0">
+        <span class="meter" :style="progressStyle"></span>
+      </div>
+
       <div class="row">
         <div class="small-12 medium-6 large-3 column">
           <p v-if="successChance !== ''">Success: {{ successChance }}%</p>
@@ -44,20 +48,6 @@
           <p v-if="despairChance !== ''">Despair: {{ despairChance }}%</p>
         </div>
       </div>
-
-      <!-- rendering makes this run crazy slow - disabled for now; need to paginate -->
-      <!-- <table v-if="uniqueOutcomes.length > 0">
-        <thead>
-          <tr>
-            <th>Result</th>
-            <th>Success</th>
-            <th>Probability</th>
-          </tr>
-        </thead>
-        <tbody>
-          <outcome v-for="(outcome, index) in uniqueOutcomes" :outcome="outcome" :possibilities="totalOutcomes" :key="index"></outcome>
-        </tbody>
-      </table> -->
     </div>
   </div>
 
@@ -65,8 +55,6 @@
 
 <script>
 import Combinatorics from 'js-combinatorics';
-
-import outcome from './Outcome';
 
 import diceData from '../config/dice.js';
 import util from '../util.js';
@@ -90,57 +78,72 @@ export default {
       successChance: '',
       critChance: '',
       triumphChance: '',
-      despairChance: ''
+      despairChance: '',
+      progress: 0
     };
   },
-  components: {
-    outcome
+  computed: {
+    progressStyle() {
+      return {
+        width: `${this.progress}%`
+      };
+    }
   },
   methods: {
     calculateProbability() {
       this.populateDice();
-      this.populateOutcomes();
-      this.populateOverview();
+      this.populateOutcomes()
+        .then(() => {
+          this.populateOverview();
+          this.progress = 100;
+        });
     },
     populateDice() {
+      this.progress = 1;
       this.dice = [];
 
       for (var i = 0, j = dieTypes.length; i < j; i++) {
         let count = parseInt(this[dieTypes[i]], 10);
+
         if (this[dieTypes[i]] && count > 0) {
           for (var ii = 0; ii < count; ii++) this.dice.push(dieResults[dieTypes[i]]);
         }
       }
     },
     populateOutcomes() {
-      util.debug('populating combos');
-      var totalCombos = Combinatorics.cartesianProduct.apply(null, this.dice).toArray();
-      util.debug('populating outcomes');
-      var outcomes = [];
-      var combinedRoll;
+      var self = this;
 
-      for (var i = 0, j = totalCombos.length; i < j; i++) {
-        combinedRoll = util.combineRolls.apply(null, totalCombos[i]);
-        // console.log(totalCombos[i], combinedRoll);
-        outcomes.push(util.serializeRoll(combinedRoll));
-      }
+      return new Promise((resolve) => {
+        self.progress = 33;
+        util.debug('populating combos');
+        // var totalCombos = Combinatorics.cartesianProduct.apply(null, self.dice).toArray();
+        util.getCartesianProduct.apply(null, self.dice)
+          .then((totalCombos) => {
+            // console.log(`combo count: ${totalCombos.length}`);
+            // console.log(totalCombos);
+            // util.debug('populating outcomes');
+            // var outcomes = [];
+            // var combinedRoll;
+            //
+            // for (var i = 0, j = totalCombos.length; i < j; i++) {
+            //   combinedRoll = util.combineRolls.apply(null, totalCombos[i]);
+            //   // console.log(totalCombos[i], combinedRoll);
+            //   outcomes.push(util.serializeRoll(combinedRoll));
+            // }
+            //
+            // self.progress = 26;
+            // util.debug('setting totalOutcomes');
+            // self.totalOutcomes = outcomes;
+            // util.debug('setting uniqueOutcomes');
+            // self.uniqueOutcomes = self.totalOutcomes.unique(); // this is a little slow
+            // util.debug('finished populateOutcomes()');
 
-      // var outcomes = totalCombos.map((combo) => {
-      //   var combinedRoll = util.combineRolls.apply(null, combo);
-      //   return util.serializeRoll(combinedRoll);
-      // }); // this is slow
-
-      console.log(outcomes);
-
-      util.debug('setting totalOutcomes');
-      // commented out sorting because it's slow, and only necessary if we're rendering a results table
-      // this.totalOutcomes = outcomes.sort(util.sortRolls); // this is very slow
-      this.totalOutcomes = outcomes;
-      util.debug('setting uniqueOutcomes');
-      this.uniqueOutcomes = this.totalOutcomes.unique(); // this is a little slow
-      util.debug('finished populateOutcomes()');
+            reject();
+          });
+      });
     },
     populateOverview() {
+      this.progress = 66;
       var successes = 0;
       var crits = 0;
       var triumphs = 0;
