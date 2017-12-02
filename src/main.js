@@ -23,7 +23,7 @@ Array.prototype.unique = function() {
   }
 
   return arr;
-}
+};
 
 /* eslint-disable no-new */
 new Vue({

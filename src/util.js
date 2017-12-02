@@ -1,50 +1,42 @@
 
 import dice from './config/dice.js';
-import Cartesian from './classes/cartesian.js';
 
 var util = {
 
-  /**
-   * Generate all possible combination of any number
-   * of variable length arrays.
-   *
-   * Takes any number of array arguments.
-   *
-   * @return {promise} The complete set of possible combinations is passed to resolve()
-   */
   getCartesianProduct() {
-    var arg = arguments;
+    const arg = arguments;
+    const max = arg.length - 1;
+
+    var results = [];
+    var resultCount;
+
+    for (var i = 0, j = arg.length; i < j; i++) {
+      resultCount = resultCount ? resultCount * arg[i].length : arg[i].length;
+    }
 
     return new Promise((resolve) => {
-      var productBuilder = new Cartesian(...arg);
+      function helper(arr, i) {
+        for (var j = 0, l = arg[i].length; j < l; j++) {
+          var a = arr.slice(0); // clone arr
 
-      // console.log(productBuilder);
+          a.push(arg[i][j]);
 
-      productBuilder.getProduct()
-        .then((results) => {
-          console.log(results);
-          resolve(results);
-        });
-      // const arg = arguments;
-      // const max = arg.length - 1;
-      //
-      // var results = [];
-      //
-      // function helper(arr, i) {
-      //   for (var j = 0, l = arg[i].length; j < l; j++) {
-      //     var a = arr.slice(0); // clone arr
-      //
-      //     a.push(arg[i][j]);
-      //
-      //     if (i == max) {
-      //       results.push(a);
-      //     } else {
-      //       helper(a, i + 1);
-      //     }
-      //   }
-      // }
-      //
-      // helper([], 0);
+          if (i === max) {
+            results.push(a);
+            if (results.length === resultCount) {
+              resolve(results);
+            }
+          } else {
+            if (resultCount > 100 && results.length % 100 === 0) {
+              setTimeout(helper(a, i + 1), 5);
+            } else {
+              helper(a, i + 1);
+            }
+          }
+        }
+      }
+
+      helper([], 0);
     });
   },
 

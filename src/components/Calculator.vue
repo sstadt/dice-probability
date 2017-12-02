@@ -4,22 +4,22 @@
     <div class="small-12 column">
       <form @submit.prevent="calculateProbability">
         <div class="row">
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Ability <input type="number" v-model="ability" /></label>
           </div>
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Proficiency <input type="number" v-model="proficiency" /></label>
           </div>
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Boost <input type="number" v-model="boost" /></label>
           </div>
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Difficulty <input type="number" v-model="difficulty" /></label>
           </div>
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Challenge <input type="number" v-model="challenge" /></label>
           </div>
-          <div class="small-6 medium-3 large-2 columns">
+          <div class="small-6 medium-4 large-2 columns">
             <label>Setback <input type="number" v-model="setback" /></label>
           </div>
         </div>
@@ -116,29 +116,26 @@ export default {
       return new Promise((resolve) => {
         self.progress = 33;
         util.debug('populating combos');
-        // var totalCombos = Combinatorics.cartesianProduct.apply(null, self.dice).toArray();
         util.getCartesianProduct.apply(null, self.dice)
           .then((totalCombos) => {
-            // console.log(`combo count: ${totalCombos.length}`);
-            // console.log(totalCombos);
-            // util.debug('populating outcomes');
-            // var outcomes = [];
-            // var combinedRoll;
-            //
-            // for (var i = 0, j = totalCombos.length; i < j; i++) {
-            //   combinedRoll = util.combineRolls.apply(null, totalCombos[i]);
-            //   // console.log(totalCombos[i], combinedRoll);
-            //   outcomes.push(util.serializeRoll(combinedRoll));
-            // }
-            //
-            // self.progress = 26;
-            // util.debug('setting totalOutcomes');
-            // self.totalOutcomes = outcomes;
-            // util.debug('setting uniqueOutcomes');
-            // self.uniqueOutcomes = self.totalOutcomes.unique(); // this is a little slow
-            // util.debug('finished populateOutcomes()');
+            util.debug(`combo count: ${totalCombos.length}`);
 
-            reject();
+            var outcomes = [];
+            var combinedRoll;
+
+            for (var i = 0, j = totalCombos.length; i < j; i++) {
+              combinedRoll = util.combineRolls.apply(null, totalCombos[i]);
+              outcomes.push(util.serializeRoll(combinedRoll));
+            }
+
+            self.progress = 26;
+            util.debug('setting totalOutcomes');
+            self.totalOutcomes = outcomes;
+            util.debug('setting uniqueOutcomes');
+            self.uniqueOutcomes = self.totalOutcomes.unique(); // this is a little slow
+            util.debug('finished populateOutcomes()');
+
+            resolve();
           });
       });
     },
